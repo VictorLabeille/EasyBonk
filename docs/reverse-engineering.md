@@ -89,7 +89,7 @@ Cap zones liées aux fixtures (`i=14`→blue win, `i=15`→red win) ; victoire =
   position **écran** (arbre Pixi, via `worldTransform`), puis caler `écran = s·monde×ppm + T`
   (échelle uniforme + translation, sans rotation). La balle/les autres entités **valident**
   l'appariement. Marche en solo (1 disque + balle) et en 1v1. Robuste au resize / zoom.
-  Implémenté dans `src/bonkers.user.js` (`collectDynamic` + `calibrate`). **Validé en jeu**
+  Implémenté dans `src/easybonk.user.js` (`collectDynamic` + `calibrate`). **Validé en jeu**
   (repère balle pile au centre, trajectoire partant du centre).
 
 ## Cycle « canon »

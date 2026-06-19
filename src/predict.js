@@ -10,7 +10,7 @@
 
 (function (root, factory) {
   if (typeof module !== "undefined" && module.exports) module.exports = factory();
-  else root.BonkersPredict = factory();
+  else root.EasyBonkPredict = factory();
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 

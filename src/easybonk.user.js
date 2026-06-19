@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         Bonkers — aide visuelle Death Ball (v1.9)
-// @namespace    bonkers
+// @name         EasyBonk — aide visuelle Death Ball (v1.9)
+// @namespace    easybonk
 // @version      1.9.2
 // @description  Trajectoire (rebonds, stop canon) + point d'accroche du grappin (rouge→vert) + balle hors-champ. Lecture seule.
 // @author       victor
@@ -17,7 +17,7 @@
 //     « → canon » là où elle entre dans un canal : la suite (canon) n'est pas prédictible.
 //   • POINT D'ACCROCHE DU GRAPPIN : la surface grappable la plus proche de ton disque,
 //     ROUGE (mur/sol) → VERT quand c'est la balle (= grappiner maintenant l'attrape).
-//     Portée réglable en jeu : __BONKERS__.grappleRange. Touche G = on/off.
+//     Portée réglable en jeu : __EASYBONK__.grappleRange. Touche G = on/off.
 //   • INDICATEUR HORS-CHAMP : flèche rouge au bord quand la balle quitte la vue.
 //   • Repères de calibration (touche M) — utiles pour vérifier l'alignement.
 //
@@ -56,7 +56,7 @@
     CALIB_LOCK_SCORE: 1.5,  // score maxi d'un calage pour compter vers le verrouillage
     TOGGLE_KEY: "Backquote",
   };
-  const log = (...a) => console.log("%c[Bonkers]", "color:#e94;font-weight:bold", ...a);
+  const log = (...a) => console.log("%c[EasyBonk]", "color:#e94;font-weight:bold", ...a);
 
   // ── Simulateur trajectoire : balistique + rebonds d'arène (miroir de src/simulate.js,
   //    validé hors-ligne à 0.00 m en vol libre). S'arrête à l'entrée du canon. ───────
@@ -196,7 +196,7 @@
     return { x: wx, y: wy, d: Math.hypot(px - wx, py - wy) };
   };
 
-  const B = (window.__BONKERS__ = window.__BONKERS__ || {});
+  const B = (window.__EASYBONK__ = window.__EASYBONK__ || {});
   Object.assign(B, {
     version: "1.9.2", cfg: CFG, enabled: true, markers: CFG.SHOW_MARKERS,
     ppm: CFG.PPM_DEFAULT, pathDelta: null, pathPrev: null, pathStop: null, stepTime: 0,
@@ -511,7 +511,7 @@
   // ── Diagnostic calibration ───────────────────────────────────────────────────
   function dumpCalib() {
     const d = B.calDbg;
-    console.log("%c==== Bonkers CALIB ====", "color:#e94;font-weight:bold");
+    console.log("%c==== EasyBonk CALIB ====", "color:#e94;font-weight:bold");
     console.log("ppm =", B.ppm, "| calage retenu =", B.cal);
     if (!d) { console.warn("pas de diagnostic (pas encore de frame ?)"); return; }
     console.log("nœuds dynamiques détectés :", d.nDyn, "| meilleur fit :", d.fit);
@@ -524,7 +524,7 @@
     if (window.bonkAPI && window.bonkAPI.addEventListener) return cb(window.bonkAPI);
     let n = 0; const id = setInterval(() => {
       if (window.bonkAPI && window.bonkAPI.addEventListener) { clearInterval(id); cb(window.bonkAPI); }
-      else if (++n > 600) { clearInterval(id); console.error("[Bonkers] bonkAPI introuvable — BonkLIB installé/activé ?"); }
+      else if (++n > 600) { clearInterval(id); console.error("[EasyBonk] bonkAPI introuvable — BonkLIB installé/activé ?"); }
     }, 100);
   }
 
@@ -532,7 +532,7 @@
     const grabPpm = (e) => { const p = e && e.mapData && e.mapData.physics && e.mapData.physics.ppm; if (p) B.ppm = p; };
     const buildWorld = (e) => {
       try { if (e && e.mapData && e.mapData.physics) { B.world = extractWorld(e.mapData); log("monde :", B.world.colliders.length, "obstacles, rayon balle", B.world.ballRadius.toFixed(2)); } }
-      catch (err) { console.error("[Bonkers] extractWorld:", err); B.world = null; }
+      catch (err) { console.error("[EasyBonk] extractWorld:", err); B.world = null; }
     };
     const resetCal = () => { B.cal = null; B.calLocked = false; B.calSamples = []; B.ballNodeRef = null; B.grapple = null; };
     api.addEventListener("gameStart", (e) => { grabPpm(e); buildWorld(e); resetCal(); log("partie démarrée, ppm =", B.ppm); });
@@ -548,6 +548,6 @@
       else if (k === "p") { dumpCalib(); }
     }, true);
 
-    log(`v${B.version} prête. ²=on/off · M=repères · G=point grappin · P=diagnostic. Régler portée : __BONKERS__.grappleRange`);
+    log(`v${B.version} prête. ²=on/off · M=repères · G=point grappin · P=diagnostic. Régler portée : __EASYBONK__.grappleRange`);
   });
 })();

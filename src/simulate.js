@@ -13,7 +13,7 @@
 
 (function (root, factory) {
   if (typeof module !== "undefined" && module.exports) module.exports = factory();
-  else root.BonkersSimulate = factory();
+  else root.EasyBonkSimulate = factory();
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 

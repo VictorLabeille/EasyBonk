@@ -1,4 +1,4 @@
-# Bonkers — aide visuelle pour bonk.io
+# EasyBonk — aide visuelle pour bonk.io
 
 Overlay **client-only** et **lecture seule** pour aider un joueur débutant sur la map
 custom **« Death Ball Cannons Pvp Grapple 1v1 Pr0 »** de [bonk.io](https://bonk.io) (mode
@@ -28,16 +28,16 @@ changement de simulation côté client seul ferait désync.)
 | `M` | repères disque/balle (debug, off par défaut) |
 | `P` | diagnostic de calibration (console) |
 
-Réglage en direct : `__BONKERS__.grappleRange` (portée d'accroche, défaut 9.5).
+Réglage en direct : `__EASYBONK__.grappleRange` (portée d'accroche, défaut 9.5).
 
 ## Installation
 
 1. Un gestionnaire de userscripts : **Tampermonkey** ou **Violentmonkey**.
 2. **Code Injector – Bonk.io** : <https://greasyfork.org/scripts/433861>
 3. **BonkLIB** : <https://greasyfork.org/scripts/508104>
-4. Charger **`src/bonkers.user.js`** dans le gestionnaire.
+4. Charger **`src/easybonk.user.js`** dans le gestionnaire.
 5. Ouvrir bonk.io et lancer une partie sur la map. Bouge un peu (et envoie la balle) : la
-   caméra se cale automatiquement, puis se **verrouille** (`[Bonkers] calage verrouillé` en
+   caméra se cale automatiquement, puis se **verrouille** (`[EasyBonk] calage verrouillé` en
    console). Les 3 scripts doivent être activés.
 
 ## Comment ça marche (les points durs résolus)
@@ -75,10 +75,10 @@ canon n'est pas prédictible** par une simulation maison (d'où l'arrêt « → 
 ## Structure
 
 ```
-bonkers/
+EasyBonk/
 ├── README.md
 ├── src/
-│   ├── bonkers.user.js          # le userscript (l'overlay complet)
+│   ├── easybonk.user.js          # le userscript (l'overlay complet)
 │   ├── predict.js               # prédicteur balistique (module pur, testé)
 │   └── simulate.js              # simulateur trajectoire + rebonds (module pur, testé)
 ├── test/

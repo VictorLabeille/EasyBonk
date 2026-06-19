@@ -1,0 +1,9 @@
+# Code propriétaire de bonk.io : conservé en local pour étude, jamais redistribué
+reference/
+
+node_modules/
+*.log
+.DS_Store
+
+# Réglages locaux de l'outillage (on garde .claude/specs/, pas les settings perso)
+.claude/settings.local.json

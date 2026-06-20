@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EasyBonk — aide visuelle Death Ball (v1.9)
 // @namespace    easybonk
-// @version      1.9.2
+// @version      1.9.3
 // @description  Trajectoire (rebonds, stop canon) + point d'accroche du grappin (rouge→vert) + balle hors-champ. Lecture seule.
 // @author       victor
 // @match        https://bonk.io/gameframe-release.html
@@ -32,7 +32,8 @@
 // La balle sert de validateur indépendant. Tout le reste est dessiné via ce
 // transform. Robuste au redimensionnement / changement de zoom.
 //
-// Touches : ² = on/off · M = repères · P = diagnostic calibration (console).
+// Touches : ² = on/off · M = repères · G = point grappin · R = forcer un recalibrage
+//           (si trajectoire/repères décalés au relancement) · P = diagnostic calibration (console).
 
 (function () {
   "use strict";
@@ -198,7 +199,7 @@
 
   const B = (window.__EASYBONK__ = window.__EASYBONK__ || {});
   Object.assign(B, {
-    version: "1.9.2", cfg: CFG, enabled: true, markers: CFG.SHOW_MARKERS,
+    version: "1.9.3", cfg: CFG, enabled: true, markers: CFG.SHOW_MARKERS,
     ppm: CFG.PPM_DEFAULT, pathDelta: null, pathPrev: null, pathStop: null, stepTime: 0,
     world: null, cal: null, calLocked: false, calSamples: [], ballNode: null, ballNodeRef: null, calDbg: null,
     grapple: null, grappleOn: true, grappleRange: 9.5, // grappleRange réglable en direct via console
@@ -545,9 +546,10 @@
       if (ev.code === CFG.TOGGLE_KEY || ev.key === "²") { ev.preventDefault(); B.enabled = !B.enabled; log("overlay", B.enabled ? "ON" : "OFF"); }
       else if (k === "m") { B.markers = !B.markers; log("repères", B.markers ? "ON" : "OFF"); }
       else if (k === "g") { B.grappleOn = !B.grappleOn; log("point grappin", B.grappleOn ? "ON" : "OFF"); }
+      else if (k === "r") { resetCal(); log("recalibrage forcé — le calage se refait sur les prochaines frames"); }
       else if (k === "p") { dumpCalib(); }
     }, true);
 
-    log(`v${B.version} prête. ²=on/off · M=repères · G=point grappin · P=diagnostic. Régler portée : __EASYBONK__.grappleRange`);
+    log(`v${B.version} prête. ²=on/off · M=repères · G=point grappin · R=recalibrer · P=diagnostic. Régler portée : __EASYBONK__.grappleRange`);
   });
 })();

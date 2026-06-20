@@ -26,6 +26,7 @@ changement de simulation côté client seul ferait désync.)
 | `²` | overlay on/off |
 | `G` | point d'accroche grappin on/off |
 | `M` | repères disque/balle (debug, off par défaut) |
+| `R` | forcer un recalibrage (si trajectoire/repères décalés au relancement d'une partie) |
 | `P` | diagnostic de calibration (console) |
 
 Réglage en direct : `__EASYBONK__.grappleRange` (portée d'accroche, défaut 9.5).

@@ -1,15 +1,21 @@
 // ==UserScript==
 // @name         EasyBonk — aide visuelle Death Ball (v1.9)
 // @namespace    easybonk
-// @version      1.9.3
+// @version      1.9.4
 // @description  Trajectoire (rebonds, stop canon) + point d'accroche du grappin (rouge→vert) + balle hors-champ. Lecture seule.
 // @author       victor
 // @match        https://bonk.io/gameframe-release.html
 // @run-at        document-start
 // @grant        none
+// @require      https://update.greasyfork.org/scripts/433861/Code%20Injector%20-%20Bonkio.user.js
+// @require      https://update.greasyfork.org/scripts/508104/BonkLIB.user.js
+// @downloadURL  https://raw.githubusercontent.com/VictorLabeille/EasyBonk/main/src/easybonk.user.js
+// @updateURL    https://raw.githubusercontent.com/VictorLabeille/EasyBonk/main/src/easybonk.user.js
 // ==/UserScript==
 
-// PRÉREQUIS : Code Injector (433861) → BonkLIB (508104) → ce script.
+// PRÉREQUIS : aucun à installer à la main. Les deux dépendances (Code Injector 433861,
+// puis BonkLIB 508104) sont chargées automatiquement via @require, dans cet ordre, avant
+// ce script. Seul Tampermonkey/Violentmonkey est requis comme moteur.
 //
 // Ce que ça fait :
 //   • TRAJECTOIRE de la balle : vol libre (gravité 10 + plafond 60) + rebonds d'arène

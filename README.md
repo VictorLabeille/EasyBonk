@@ -33,13 +33,18 @@ Réglage en direct : `__EASYBONK__.grappleRange` (portée d'accroche, défaut 9.
 
 ## Installation
 
-1. Un gestionnaire de userscripts : **Tampermonkey** ou **Violentmonkey**.
-2. **Code Injector – Bonk.io** : <https://greasyfork.org/scripts/433861>
-3. **BonkLIB** : <https://greasyfork.org/scripts/508104>
-4. Charger **`src/easybonk.user.js`** dans le gestionnaire.
-5. Ouvrir bonk.io et lancer une partie sur la map. Bouge un peu (et envoie la balle) : la
+1. Installer **Tampermonkey** (ou Violentmonkey) — une fois, c'est le moteur qui fait
+   tourner les userscripts.
+2. **Cliquer ce lien**, puis « Installer » dans la fenêtre du gestionnaire :
+   <https://raw.githubusercontent.com/VictorLabeille/EasyBonk/main/src/easybonk.user.js>
+3. Ouvrir bonk.io et lancer une partie sur la map. Bouge un peu (et envoie la balle) : la
    caméra se cale automatiquement, puis se **verrouille** (`[EasyBonk] calage verrouillé` en
-   console). Les 3 scripts doivent être activés.
+   console).
+
+> **Les deux dépendances sont chargées automatiquement.** EasyBonk les tire via `@require`
+> (Code Injector [433861](https://greasyfork.org/scripts/433861), puis
+> BonkLIB [508104](https://greasyfork.org/scripts/508104)) : rien à installer à la main, et
+> le script se met à jour tout seul. Un seul userscript à activer dans le gestionnaire.
 
 ## Comment ça marche (les points durs résolus)
 

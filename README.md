@@ -1,106 +1,91 @@
-# EasyBonk — aide visuelle pour bonk.io
+# EasyBonk
 
-Overlay **client-only** et **lecture seule** pour aider un joueur débutant sur la map
-custom **« Death Ball Cannons Pvp Grapple 1v1 Pr0 »** de [bonk.io](https://bonk.io) (mode
-grappin) : il dessine par-dessus le jeu, sans jamais toucher à la simulation.
+**It draws on top of the game. It never touches the game.**
 
-> But du mode : on **meurt si on touche la Death Ball** ; il faut la **renvoyer** au grappin
-> en jouant avec l'inertie. L'overlay aide à anticiper la balle et à viser le grappin.
+A read-only overlay for [bonk.io](https://bonk.io), for one custom map — *Death Ball Cannons Pvp
+Grapple 1v1 Pr0*, grapple mode. You die if you touch the Death Ball; you survive by grappling it
+back, playing the inertia. The overlay helps a beginner read where the ball is going and where the
+grapple would catch.
 
-## Ce que ça fait
+## What it shows
 
-| Aide | Détail |
-|---|---|
-| 🔴 **Trajectoire de la balle** | Vol libre (gravité 10, plafond 60) **+ rebonds d'arène** (collision continue, restitution réelle). Marqueur **orange « → canon »** là où elle entre dans un canal (la suite, dans le canon, n'est pas prédictible). Validée **hors-ligne à 0.00 m** sur des captures réelles. |
-| 🎯 **Point d'accroche du grappin** | La surface grappable la **plus proche** de ton disque : **rouge** (mur / sol / barrières) → **vert** quand c'est la **balle** (= grappiner maintenant l'attraperait). |
-| ➡️ **Indicateur hors-champ** | Flèche rouge au bord de l'écran pointant vers la balle quand elle a quitté la vue (canon). |
+| Aid | What it does |
+| --- | --- |
+| 🔴 **Ball trajectory** | Free flight plus arena bounces, with continuous collision and real per-surface restitution. An orange **"→ cannon"** marker where the ball enters a channel — what happens inside the cannon is not predictable, so the line stops there and says so |
+| 🎯 **Grapple anchor** | The grappable surface nearest your disc: **red** for wall, floor or barrier, turning **green** when it is the ball — grapple now and you catch it |
+| ➡️ **Off-screen arrow** | Points at the ball once a cannon has taken it out of view |
 
-**100 % visuel, lecture seule.** Aucune injection d'input, aucune modif de la physique →
-**pas de désync, pas de kick**. (La physique de bonk est déterministe et synchronisée : tout
-changement de simulation côté client seul ferait désync.)
-
-### Touches
-
-| Touche | Effet |
-|---|---|
+| Key | Effect |
+| --- | --- |
 | `²` | overlay on/off |
-| `G` | point d'accroche grappin on/off |
-| `M` | repères disque/balle (debug, off par défaut) |
-| `R` | forcer un recalibrage (si trajectoire/repères décalés au relancement d'une partie) |
-| `P` | diagnostic de calibration (console) |
+| `G` | grapple anchor on/off |
+| `M` | disc/ball markers (debug, off by default) |
+| `R` | force a recalibration, if things look offset after a restart |
+| `P` | calibration diagnostics, in the console |
 
-Réglage en direct : `__EASYBONK__.grappleRange` (portée d'accroche, défaut 9.5).
+Live tuning: `__EASYBONK__.grappleRange`, the catch range, default 9.5.
 
-## Installation
+## Install
 
-1. Installer **Tampermonkey** (ou Violentmonkey) — une fois, c'est le moteur qui fait
-   tourner les userscripts.
-2. **Cliquer ce lien**, puis « Installer » dans la fenêtre du gestionnaire :
-   <https://raw.githubusercontent.com/VictorLabeille/EasyBonk/main/src/easybonk.user.js>
-3. Ouvrir bonk.io et lancer une partie sur la map. Bouge un peu (et envoie la balle) : la
-   caméra se cale automatiquement, puis se **verrouille** (`[EasyBonk] calage verrouillé` en
-   console).
+1. Install **Tampermonkey** (or Violentmonkey) — once; it is the engine that runs userscripts.
+2. [**Click here**](https://raw.githubusercontent.com/VictorLabeille/EasyBonk/main/src/easybonk.user.js),
+   then **Install** in the manager window.
+3. Open bonk.io and start a game on the map. Move around, send the ball once: the camera calibrates
+   itself, then locks — `[EasyBonk] calage verrouillé` appears in the console.
 
-> **Les deux dépendances sont chargées automatiquement.** EasyBonk les tire via `@require`
-> (Code Injector [433861](https://greasyfork.org/scripts/433861), puis
-> BonkLIB [508104](https://greasyfork.org/scripts/508104)) : rien à installer à la main, et
-> le script se met à jour tout seul. Un seul userscript à activer dans le gestionnaire.
+One userscript, nothing else. Its two dependencies — Code Injector
+([433861](https://greasyfork.org/scripts/433861)) and BonkLIB
+([508104](https://greasyfork.org/scripts/508104)) — are pulled in by `@require` and update
+themselves.
 
-## Comment ça marche (les points durs résolus)
+## The two hard parts
 
-L'overlay s'appuie sur **BonkLIB** (`window.bonkAPI`), qui patche le bundle obfusqué du jeu
-et expose des hooks propres (`stepEvent`, `gameStart`, `graphicsUpdate`, conteneur Pixi…).
-Deux problèmes non triviaux ont demandé du reverse-engineering (détaillé dans
-[`docs/reverse-engineering.md`](docs/reverse-engineering.md)) :
+Full write-up in [`docs/reverse-engineering.md`](docs/reverse-engineering.md).
 
-- **Aligner le dessin sur la caméra.** Bonk n'applique PAS le zoom via un transform Pixi
-  (tous les conteneurs sont en `scale=1`) : il « cuit » `monde × ppm × scaleRatio + pan`
-  dans les coordonnées, et `scaleRatio` n'est pas lisible (code chiffré). On le **retrouve
-  à l'exécution** : les entités qui bougent sont des nœuds Pixi dont on connaît la position
-  *monde* (gameState) et qu'on lit à l'écran (arbre Pixi) → on cale un transform `échelle +
-  translation`, puis on le **verrouille** (la caméra de cette map est fixe) pour la stabilité
-  et la perf.
-- **Physique exacte.** Constantes et règles extraites des données de la map et validées
-  contre des captures : gravité 10, vitesse max 60, restitution par surface (murs normaux 0,
-  cages 0.8, plateformes 3, **canons `re=99999`**), **calques de collision** (la balle
-  traverse les « Barriers » que le grappin, lui, peut accrocher).
+**Drawing where the game draws.** Bonk does not apply zoom through a Pixi transform — every
+container sits at `scale=1`. It bakes `world × ppm × scaleRatio + pan` straight into the
+coordinates, and `scaleRatio` is not readable: that code is encrypted. So it is recovered at
+runtime instead. Entities that move are Pixi nodes whose world position is known from the game
+state and whose screen position can be read from the Pixi tree; two readings give a scale and a
+translation. Once found, the transform is **locked** — this map's camera is fixed, and locking buys
+both stability and frames.
 
-Le cœur physique est un **module pur testable hors-ligne** (`src/predict.js`,
-`src/simulate.js`), miroir de la logique inlinée dans le userscript.
+**Getting the physics right.** Constants and rules were pulled out of the map data and checked
+against real captures: gravity 10, terminal speed 60, restitution per surface (plain walls 0, cages
+0.8, platforms 3, cannons `re=99999`), and collision layers — the ball passes through the barriers
+that the grapple can still catch.
 
-## Validation hors-ligne
+The physics core is a **pure module, testable offline**, mirroring the logic inlined in the
+userscript:
 
 ```bash
-node test/validate-predict.js     # prédicteur balistique vs captures réelles
-node test/validate-simulate.js    # simulateur à rebonds vs cycle « canon »
+node test/validate-predict.js     # ballistic predictor against real captures
+node test/validate-simulate.js    # bouncing simulator against the cannon cycle
 ```
 
-En vol libre, l'erreur est **0.00 m** ; on a aussi vérifié empiriquement que le **cycle
-canon n'est pas prédictible** par une simulation maison (d'où l'arrêt « → canon »).
+In free flight the error is **0.00 m**. The cannon cycle, measured, turned out **not** to be
+reproducible by a home simulation — which is why the prediction stops at the cannon mouth rather
+than guessing.
 
-## Structure
+## Repository map
 
-```
-EasyBonk/
-├── README.md
-├── src/
-│   ├── easybonk.user.js          # le userscript (l'overlay complet)
-│   ├── predict.js               # prédicteur balistique (module pur, testé)
-│   └── simulate.js              # simulateur trajectoire + rebonds (module pur, testé)
-├── test/
-│   ├── validate-predict.js      # validation du prédicteur sur captures réelles
-│   └── validate-simulate.js     # validation du simulateur sur le cycle canon
-├── docs/
-│   └── reverse-engineering.md   # toutes les trouvailles de recon (coords, physique, grappin…)
-├── .claude/specs/               # cadrage fonctionnel (périmètre, faisabilité)
-└── reference/                   # copies locales pour étude — gitignoré, NON redistribué
-```
+| Path | What is there |
+| --- | --- |
+| `src/easybonk.user.js` | The userscript — the whole overlay |
+| `src/predict.js`, `src/simulate.js` | Ballistic predictor and bouncing simulator, pure and tested |
+| `test/` | Offline validation against real captures |
+| `docs/reverse-engineering.md` | Everything the reconnaissance found: coordinates, physics, grapple |
+| `.claude/specs/` | The functional brief — scope and feasibility |
+| `reference/` | Local copies kept for study — git-ignored, **not redistributed** |
 
-## Notes légales / éthique
+Documentation is in French; this page is not.
 
-- Le code de bonk.io est **propriétaire et obfusqué**. Le dossier `reference/` (bundle du
-  jeu, BonkLIB, captures) sert uniquement à l'étude locale et est **gitignoré — ne pas le
-  redistribuer**.
-- Cet overlay est **client-side, lecture seule** (confort / lisibilité) : il n'injecte aucun
-  input et ne modifie pas la partie des autres joueurs. Pas d'aimbot ni d'automatisation —
-  c'est volontaire et assumé dès le cadrage.
+## Legal and ethics
+
+bonk.io's code is **proprietary and obfuscated**. `reference/` holds the game bundle, BonkLIB and
+captures for local study only; it is git-ignored and must not be redistributed.
+
+This overlay is **client-side and read-only**. It injects no input, alters no physics and changes
+nothing for the other players — bonk's simulation is deterministic and synchronised, so touching it
+client-side would desync and get you kicked anyway. No aimbot, no automation. That line was drawn
+in the brief, before the first line of code, and it is the reason the project stays where it is.
